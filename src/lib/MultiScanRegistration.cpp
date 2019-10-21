@@ -33,8 +33,12 @@
 #include "loam_velodyne/MultiScanRegistration.h"
 #include "math_utils.h"
 
+#include <map>
+#include "boost/assign.hpp"
+
 #include <pcl_conversions/pcl_conversions.h>
 
+std::map <int,int> m = boost::assign::map_list_of(150,31) (103,30) (70,29) (46,28) (33,27) (23,26) (16,25) (13,24) (10,23) (6,22) (3,21) (0,20) (-3,19) (-6,18) (-10,17) (-13,16) (-16,15) (-20,14) (-23,13) (-26,12) (-30,11) (-33,10) (-36,9) (-40,8) (-46,7) (-53,6) (-61,5) (-72,4) (-88,3) (-113,2) (-156,1) (-250,0);
 
 namespace loam {
 
@@ -62,7 +66,8 @@ void MultiScanMapper::set(const float &lowerBound,
 
 
 int MultiScanMapper::getRingForAngle(const float& angle) {
-  return int(((angle * 180 / M_PI) - _lowerBound) * _factor + 0.5);
+    return m.find(int((angle * 180 / M_PI)*10))->second;
+//    return int(((angle * 180 / M_PI) - _lowerBound) * _factor + 0.5);
 }
 
 
@@ -93,7 +98,7 @@ bool MultiScanRegistration::setupROS(ros::NodeHandle& node, ros::NodeHandle& pri
 
   // fetch scan mapping params
   std::string lidarName;
-
+//  lidarName = "VLP-32";
   if (privateNode.getParam("lidar", lidarName)) {
     if (lidarName == "VLP-16") {
       _scanMapper = MultiScanMapper::Velodyne_VLP_16();
@@ -101,8 +106,11 @@ bool MultiScanRegistration::setupROS(ros::NodeHandle& node, ros::NodeHandle& pri
       _scanMapper = MultiScanMapper::Velodyne_HDL_32();
     } else if (lidarName == "HDL-64E") {
       _scanMapper = MultiScanMapper::Velodyne_HDL_64E();
-    } else {
-      ROS_ERROR("Invalid lidar parameter: %s (only \"VLP-16\", \"HDL-32\" and \"HDL-64E\" are supported)", lidarName.c_str());
+    } else if (lidarName == "VLP-32"){
+      _scanMapper = MultiScanMapper::Velodyne_VLP_32();
+    }
+    else{
+      ROS_ERROR("Invalid lidar parameter: %s (only \"VLP-32\"is supported)", lidarName.c_str());
       return false;
     }
 
