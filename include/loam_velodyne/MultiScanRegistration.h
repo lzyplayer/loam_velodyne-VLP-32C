@@ -56,11 +56,14 @@ public:
    */
   MultiScanMapper(const float& lowerBound = -15,
                   const float& upperBound = 15,
-                  const uint16_t& nScanRings = 16);
+                  const uint16_t& nScanRings = 16,
+                  std::map<int,int>  _m = {{150,31}, {103,30}, {70,29}, {46,28}, {33,27}, {23,26}, {16,25}, {13,24}, {10,23}, {6,22}, {3,21}, {0,20}, {-3,19}, {-6,18}, {-10,17}, {-13,16}, {-16,15}, {-20,14}, {-23,13}, {-26,12}, {-30,11}, {-33,10}, {-36,9}, {-40,8}, {-46,7}, {-53,6}, {-61,5}, {-72,4}, {-88,3}, {-113,2}, {-156,1}, {-250,0}}
+    );
 
   const float& getLowerBound() { return _lowerBound; }
   const float& getUpperBound() { return _upperBound; }
   const uint16_t& getNumberOfScanRings() { return _nScanRings; }
+  const std::map<int,int>& getMap(){ return  _m;}
 
   /** \brief Set mapping parameters.
    *
@@ -91,11 +94,16 @@ public:
   /** Multi scan mapper for Velodyne VLP-32C according to data sheet note:"different_resolution". */
   static inline MultiScanMapper Velodyne_VLP_32() { return MultiScanMapper(-25.0f, 15.0f, 32); };
 
+  /** utility for sign**/
+  static inline float sgn(float value) {return (0.0f < value) - (value < 0.0f); };
+
+
 private:
   float _lowerBound;      ///< the vertical angle of the first scan ring
   float _upperBound;      ///< the vertical angle of the last scan ring
   uint16_t _nScanRings;   ///< number of scan rings
   float _factor;          ///< linear interpolation factor
+  std::map <int,int> _m;  ///< map of lidar model
 };
 
 

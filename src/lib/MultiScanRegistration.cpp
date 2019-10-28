@@ -1,3 +1,5 @@
+#include <utility>
+
 // Copyright 2013, Ji Zhang, Carnegie Mellon University
 // Further contributions copyright (c) 2016, Southwest Research Institute
 // All rights reserved.
@@ -38,17 +40,20 @@
 
 #include <pcl_conversions/pcl_conversions.h>
 
-std::map <int,int> m = boost::assign::map_list_of(150,31) (103,30) (70,29) (46,28) (33,27) (23,26) (16,25) (13,24) (10,23) (6,22) (3,21) (0,20) (-3,19) (-6,18) (-10,17) (-13,16) (-16,15) (-20,14) (-23,13) (-26,12) (-30,11) (-33,10) (-36,9) (-40,8) (-46,7) (-53,6) (-61,5) (-72,4) (-88,3) (-113,2) (-156,1) (-250,0);
 
 namespace loam {
 
 MultiScanMapper::MultiScanMapper(const float& lowerBound,
                                  const float& upperBound,
-                                 const uint16_t& nScanRings)
+                                 const uint16_t& nScanRings,
+                                 std::map<int,int>  map)
     : _lowerBound(lowerBound),
       _upperBound(upperBound),
       _nScanRings(nScanRings),
-      _factor((nScanRings - 1) / (upperBound - lowerBound))
+      _factor((nScanRings - 1) / (upperBound - lowerBound)),
+      _m(std::move(map))
+
+
 {
 
 }
@@ -66,10 +71,10 @@ void MultiScanMapper::set(const float &lowerBound,
 
 
 int MultiScanMapper::getRingForAngle(const float& angle) {
-    return m.find(int((angle * 180 / M_PI)*10))->second;
-//    return int(((angle * 180 / M_PI) - _lowerBound) * _factor + 0.5);
+    return _m.find(int((angle * 180 / M_PI)*10+0.01f*sgn(angle)))->second;
 }
 
+//    return int(((angle * 180 / M_PI) - _lowerBound) * _factor + 0.5);
 
 
 
